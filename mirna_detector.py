@@ -9,17 +9,20 @@ expression = '((hsa|mmu|\b)?-?(miRNA-|miR|\(miR\)|micoRNA|hsa-let|let-|microRNA-
 extraction = '(hsa-(mir|let)-\d+(-|\w|\/)*)+'
 
 mirnas = []
-with open('data/mirna.txt') as f:
+ids = []
+with open('data/mirbase_lu.tsv') as f:
 
     content = f.readlines()
     for line in content:
         values = line.split('\t')
-        mirna = values[2]
-        if mirna.find('hsa') != -1:
-            mirnas.append(mirna)
-            values = values[3].split(';')
-            if values[0]!='':
-                mirnas+=values
+        mirbaseid = values[0]
+        mirna = values[1]
+
+        ids.append(mirbaseid)
+        values = mirna.split(';')
+        mirnas+=values
+        for i in range(len(values)):
+            ids.append(mirbaseid)
 
 
 def refine(results):
@@ -124,7 +127,8 @@ def validate(sentence):
             for miRNA in values:
                 detected["detectedMirnas"].append({
                     "mirna": miRNA,
-                    "origin": extractValue
+                    "origin": extractValue,
+                    "id": ids[mirnas.index(miRNA)] if miRNA in mirnas else '-'
                 })
         parsedResults += values
 
