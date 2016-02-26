@@ -10,7 +10,7 @@ extraction = '(hsa-(mir|let)-\d+(-|\w|\/)*)+'
 
 mirnas = []
 ids = []
-with open('data/mirbase_lu.tsv') as f:
+with open('mirnadetector/data/mirbase_lu.tsv') as f:
 
     content = f.readlines()
     for line in content:
@@ -18,11 +18,12 @@ with open('data/mirbase_lu.tsv') as f:
         mirbaseid = values[0]
         mirna = values[1]
 
-        ids.append(mirbaseid)
-        values = mirna.split(';')
-        mirnas+=values
+        
+        values = mirna.strip().split(';')
+        
         for i in range(len(values)):
             ids.append(mirbaseid)
+            mirnas.append(values[i])
 
 
 def refine(results):
@@ -124,12 +125,28 @@ def validate(sentence):
         values = splitter(extractValue)
         values = filterMirnas(values)
         if len(values)>0:
-            for miRNA in values:
+            indexes = [i for i, mirna in enumerate(mirnas) if mirna == values[0]]
+            
+            for s_index in indexes:
                 detected["detectedMirnas"].append({
-                    "mirna": miRNA,
+                    "value": values[0],
                     "origin": extractValue,
-                    "id": ids[mirnas.index(miRNA)] if miRNA in mirnas else '-'
+                    "id": ids[s_index],
+                    "from": result[1],
+                    "to": result[2],
+                    "type": "miRNA"
                 })
+
+            if(len(indexes)==0):
+                detected["detectedMirnas"].append({
+                    "value": values[0],
+                    "origin": extractValue,
+                    "id": values[0],
+                    "from": result[1],
+                    "to": result[2],
+                    "type": "miRNA"
+                })
+
         parsedResults += values
 
     return detected
