@@ -10,7 +10,7 @@ extraction = '(hsa-(mir|let)-\d+(-|\w|\/)*)+'
 
 mirnas = []
 ids = []
-with open('mirnadetector/data/mirbase_lu.tsv') as f:
+with open('data/mirbase_lu.tsv') as f:
 
     content = f.readlines()
     for line in content:
@@ -124,28 +124,30 @@ def validate(sentence):
 
         values = splitter(extractValue)
         values = filterMirnas(values)
-        if len(values)>0:
-            indexes = [i for i, mirna in enumerate(mirnas) if mirna == values[0]]
-            
-            for s_index in indexes:
-                detected["detectedMirnas"].append({
-                    "value": values[0],
-                    "origin": extractValue,
-                    "id": ids[s_index],
-                    "from": result[1],
-                    "to": result[2],
-                    "type": "miRNA"
-                })
 
-            if(len(indexes)==0):
-                detected["detectedMirnas"].append({
-                    "value": values[0],
-                    "origin": extractValue,
-                    "id": values[0],
-                    "from": result[1],
-                    "to": result[2],
-                    "type": "miRNA"
-                })
+        if len(values)>0:
+            for value in values:
+                indexes = [i for i, mirna in enumerate(mirnas) if mirna == value]
+                
+                for s_index in indexes:
+                    detected["detectedMirnas"].append({
+                        "value": value,
+                        "origin": extractValue,
+                        "id": ids[s_index],
+                        "from": result[1],
+                        "to": result[2],
+                        "type": "miRNA"
+                    })
+
+                if(len(indexes)==0):
+                    detected["detectedMirnas"].append({
+                        "value": value,
+                        "origin": extractValue,
+                        "id": values[0],
+                        "from": result[1],
+                        "to": result[2],
+                        "type": "miRNA"
+                    })
 
         parsedResults += values
 
