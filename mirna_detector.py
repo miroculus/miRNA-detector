@@ -143,7 +143,7 @@ def validate(sentence):
                     detected["detectedMirnas"].append({
                         "value": value,
                         "origin": extractValue,
-                        "id": values[0],
+                        "id": values,
                         "from": result[1],
                         "to": result[2],
                         "type": "miRNA"
